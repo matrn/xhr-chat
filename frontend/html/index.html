@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta charset="utf-8">
+	<title>XHR Chat</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+	<h1 class="center">XHR chat</h1>
+	<div id="settings-box">
+		<span>Your nickname: </span><span id="info-nickname"></span>
+		<br>
+		<span>Chatting with: </span><span id="info-chatwith"></span>
+		<br>
+		<label for="nickname">Nickname: </label><input type="text" id="nickname" onfocusout="set_nickname()">
+		<br>
+		<label for="chatwith">Chat with: </label><input type="text" id="chatwith" onfocusout="set_chatwith()">
+	</div>
+
+	<div id="fail-box"></div>
+	<div id="chat-box"></div>
+	<div id="send">
+		<input type="text" id="send-box" onKeyDown="if(event.keyCode==13) send_msg();">
+		<button id="send-btn" onclick="send_msg()">send</button>
+	</div>
+
+	<script src="js/script.js"></script>
+</body>
+</html>

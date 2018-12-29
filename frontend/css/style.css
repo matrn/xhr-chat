@@ -1,0 +1,25 @@
+html, body {
+	width: 80%;
+	margin: auto;
+}
+
+.center {
+	text-align: center;
+}
+#chat-box {
+	border: 1px solid black;
+	min-height: 80px;
+	margin-bottom: 20px;
+}
+
+#send {
+	text-align: center;
+}
+
+#fail-box {
+	color: red;
+}
+
+#settings-box {
+	margin-bottom: 60px;
+}
