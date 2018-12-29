@@ -6,6 +6,7 @@ html, body {
 .center {
 	text-align: center;
 }
+
 #chat-box {
 	border: 1px solid black;
 	min-height: 80px;
