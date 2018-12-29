@@ -13,3 +13,4 @@ After downloading this repository open file named index.html, this file is examp
  * Documentation
  * Add style to website
  * Fix more messages bug
+ * Fix CTRL+C server_close() hang bug
