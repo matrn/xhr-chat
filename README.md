@@ -9,8 +9,8 @@ After downloading this repository open file named index.html, this file is examp
 
 ## ToDo
 
- * Cleanup code
  * Documentation
  * Add style to website
  * Fix more messages bug
  * Fix CTRL+C server_close() hang bug
+ * handle ajax fail

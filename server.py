@@ -30,18 +30,20 @@ mimetypes = {
 
 PROGRAM_DIR = os.path.dirname(os.path.realpath(__file__))
 
-msgs = []
-timeout = 5000
+msgs = []   #variable for saving received messages
+timeout = 5000   #timeout - same as in script.js
 
 millis = lambda: int(round(time.time() * 1000))
 
+
+
 class RequestHandler(BaseHTTPRequestHandler):   #function for handling requests
 	def do_GET(self):   #handle GET request	
-		request_path = self.path
+		request_path = self.path   #request path
 		
-		print(">" + request_path + "<")
+		print("GET request, path >" + request_path + "<")
 
-		#remove security dangerous characters:
+		#remove security dangerous characters - handle path traversal possibility, or is it already handled in library? idk
 		request_path = request_path.replace("../", "/")
 
 
@@ -68,20 +70,20 @@ class RequestHandler(BaseHTTPRequestHandler):   #function for handling requests
 			filename = os.path.basename(request_path)
 			send_file(self, "frontend/img/" + filename)
 
-		elif request_path == "/get_msg":
+		elif request_path == "/get_msg":   #for sending messages to client
 			'''
 			content_length = self.headers.getheaders('content-length')   #get length of request body
 			length = int(content_length[0]) if content_length else 0
 		
 			request_body = self.rfile.read(length)   #get request body
 			'''
-			request_info = self.headers.getheaders('info')[0]
-			print(request_info)
-			info = parse_info(request_info)
+			request_info = self.headers.getheaders('info')[0]   #get json data from header saved under info
+			print("info JSON: >" + request_info + "<")
+			info = parse_info(request_info)   #parse nickname and stranger nickname from JSON
 			nick = info[0]
 			stranger = info[1]
 
-			start = millis()
+			start = millis()   #actual millis (unix time)
 			leave = 0
 			while leave != 1 or millis() - leave < timeout:
 				for a in msgs:
@@ -92,13 +94,13 @@ class RequestHandler(BaseHTTPRequestHandler):   #function for handling requests
 						self.wfile.write(a[2])
 						self.wfile.write('\n')
 
-						msgs.remove(a)
+						msgs.remove(a)   #remove this msg from list because we found correct client
 
-						leave = 1
+						leave = 1   #leave while loop
 
-				time.sleep(0.1)
+				time.sleep(0.1)   #for lowering CPU consumption
 
-			if leave == 0:
+			if leave == 0:   #no data for client
 				self.send_response(204)
 				self.send_header("Content-type", "text/plain")
 				self.end_headers()
@@ -108,20 +110,20 @@ class RequestHandler(BaseHTTPRequestHandler):   #function for handling requests
 
 
 	def do_POST(self):   #handle POST request		
-		request_path = self.path
+		request_path = self.path   #request path
 		
-		print(">" + request_path + "<")
+		print("POST request, path >" + request_path + "<")
 		
 
-		if request_path == "/submit_msg":
+		if request_path == "/submit_msg":   #new message from client
 			content_length = self.headers.getheaders('content-length')   #get length of request body
 			length = int(content_length[0]) if content_length else 0
 		
 			request_body = self.rfile.read(length)   #get request body
-			request_info = self.headers.getheaders('info')[0]
-			print(request_info)
-			info = parse_info(request_info)
-			msgs.append((info[0], info[1], request_body))
+			request_info = self.headers.getheaders('info')[0]   #get info JSON from header
+			print("info JSON >" + request_info + "<")
+			info = parse_info(request_info)   #parse nickname and stranger nickname from JSON
+			msgs.append((info[0], info[1], request_body))   #add this msg to msgs list
 
 			self.send_response(200)
 			self.send_header("Content-type", "text/html")
@@ -136,10 +138,10 @@ class RequestHandler(BaseHTTPRequestHandler):   #function for handling requests
 
 	do_PUT = do_POST
 	do_DELETE = do_GET
-	
 
 
-def parse_info(msg):
+
+def parse_info(msg):   #function for parsing nickname and stranger nickname from JSON
 	data = json.loads(msg)
 	return data["nick"], data["stranger"]
 
@@ -177,7 +179,7 @@ def send_404(self):   #for sending ERROR 404
 	self.send_error(404,'File Not Found: %s' % self.path)   #send 404 error
 
 
-def get_mimetype(filename):   #functions for getting mimetype
+def get_mimetype(filename):   #function for getting mimetype
 	mimetype = ""
 
 	try:
@@ -192,7 +194,9 @@ def get_mimetype(filename):   #functions for getting mimetype
 		return 'text/plain'
 
 
-class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):   #used for forking requests - because /get_msg is waiting for new message and it will block other request without threading
+	daemon_threads = True
 	"""Handle requests in a separate thread."""
 
 
@@ -200,15 +204,17 @@ def main():
 	try:
 		port = 8008
 		print('Listening on localhost:%s' % port)
+
 		server = ThreadedHTTPServer(('', port), RequestHandler)
 		server.serve_forever()
 
-	except KeyboardInterrupt:
+	except KeyboardInterrupt:   #handle CTRL+C
 		print('^C received, shutting down server')
 		server.shutdown()
 		print("Closing server")
    		server.server_close()
 
-		
+
+
 if __name__ == "__main__":  
 	main()
