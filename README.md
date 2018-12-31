@@ -5,12 +5,11 @@ Chat contains python web server and javascript client for chat communication. Fo
 
 ## Getting Started
 
-After downloading this repository open file named index.html, this file is example of usage.
+After downloading this repository run file server.py with python 2.7 (tested with this version). Open your browser, write here your computer IP address and port specified in function main() (default is 8008).
 
 ## ToDo
 
  * Documentation
  * Add style to website
  * Fix more messages bug
- * Fix CTRL+C server_close() hang bug
  * handle ajax fail

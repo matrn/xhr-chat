@@ -33,7 +33,7 @@ PROGRAM_DIR = os.path.dirname(os.path.realpath(__file__))
 msgs = []   #variable for saving received messages
 timeout = 5000   #timeout - same as in script.js
 
-millis = lambda: int(round(time.time() * 1000))
+millis = lambda: int(round(time.time() * 1000))   #function for getting current millis (unix time)
 
 
 
