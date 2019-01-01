@@ -130,5 +130,5 @@ set_chatwith();
 
 check_msg();
 
-setInterval(renew_check_msg_cycle, time);
+setInterval(renew_check_msg_cycle, 5000);   //check for renewing ajax connection every 5 seconds
 //----------startup----------
