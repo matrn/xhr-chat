@@ -28,15 +28,15 @@ function ajax(type, path, data, timeout, func, timeout_func){   //ajax XHR wrapp
 			else if(this.status === 204){   //no data
 				timeout_func();   //call timeout function because server closed connection with return code 204 - no conten (data)
 			}
-
-			else if(this.status === 0){   //no data
+			/*
+			else if(this.status === 0){   //no data - this is weird
 				console.log("Status is 0, error: " + this.statusText);
 				//timeout_func();   //call timeout function because server closed connection with return code 204 - no conten (data)
 			}
-
+			*/
 			else{
 				console.log(this.status);
-				fail("Unknown status: " + this.status);
+				fail("Unknown status: " + this.status + " status text: " + this.statusText);
 			}
 		//}
 		/*
@@ -44,7 +44,9 @@ function ajax(type, path, data, timeout, func, timeout_func){   //ajax XHR wrapp
 			fail(this.status + " " + this.responseText);
 		}*/
 	};
+
 	xhr.open(type, path, true);
+
 	if(timeout > 0){
 		xhr.timeout = timeout;   //set timeout if timeout is bigger than 0
 
@@ -61,6 +63,7 @@ function ajax(type, path, data, timeout, func, timeout_func){   //ajax XHR wrapp
 	var json = JSON.stringify(fin);   //create JSON
 
 	xhr.setRequestHeader("info", json);   //add JSON to header
+
 	xhr.send(data);   //send data
 }
 

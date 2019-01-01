@@ -70,6 +70,7 @@ class RequestHandler(BaseHTTPRequestHandler):   #function for handling requests
 			filename = os.path.basename(request_path)
 			send_file(self, "frontend/img/" + filename)
 
+
 		elif request_path == "/get_msg":   #for sending messages to client
 			'''
 			content_length = self.headers.getheaders('content-length')   #get length of request body
@@ -78,14 +79,18 @@ class RequestHandler(BaseHTTPRequestHandler):   #function for handling requests
 			request_body = self.rfile.read(length)   #get request body
 			'''
 			request_info = self.headers.getheaders('info')[0]   #get json data from header saved under info
+
 			print("info JSON: >" + request_info + "<")
+			
 			info = parse_info(request_info)   #parse nickname and stranger nickname from JSON
 			nick = info[0]
 			stranger = info[1]
 
 			start = millis()   #actual millis (unix time)
 			leave = 0
-			while leave != 1 and millis() - start < timeout:
+
+			while leave != 1 and millis() - start < timeout - 100:   #timeout is without 100ms because we want to avoid getting error: [Errno 32] Broken pipe
+ 
 				for a in msgs:
 					if(a[0] == stranger and a[1] == nick):
 						self.send_response(200)
@@ -98,16 +103,18 @@ class RequestHandler(BaseHTTPRequestHandler):   #function for handling requests
 
 						leave = 1   #leave while loop
 						print("data sent, leaving")
-						break
+						break   #leave this for loop
 
 				time.sleep(0.1)   #for lowering CPU consumption
 
 			if leave == 0:   #no data for client
 				print("leaving because timeout")
+
 				self.send_response(204)
 				self.send_header("Content-type", "text/plain")
 				self.end_headers()
 				self.wfile.write("No data")
+
 
 		else:   #ERROR 404
 			send_404(self)
@@ -118,20 +125,21 @@ class RequestHandler(BaseHTTPRequestHandler):   #function for handling requests
 		
 		print("POST request, path >" + request_path + "<")
 		
-
 		if request_path == "/submit_msg":   #new message from client
 			content_length = self.headers.getheaders('content-length')   #get length of request body
 			length = int(content_length[0]) if content_length else 0
 		
 			request_body = self.rfile.read(length)   #get request body
 			request_info = self.headers.getheaders('info')[0]   #get info JSON from header
+
 			print("info JSON >" + request_info + "<")
+
 			info = parse_info(request_info)   #parse nickname and stranger nickname from JSON
+
 			msgs.append((info[0], info[1], request_body))   #add this msg to msgs list
 
 			self.send_response(200)
 			self.send_header("Content-type", "text/html")
-
 			self.end_headers()
 			self.wfile.write("OK")
 
@@ -196,6 +204,7 @@ def get_mimetype(filename):   #function for getting mimetype
 
 	except:
 		return 'text/plain'
+
 
 
 
