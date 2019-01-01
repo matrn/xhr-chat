@@ -1,6 +1,8 @@
 html, body {
 	width: 80%;
 	margin: auto;
+	background-color: #2B7379;
+	color: #FAE3D6;
 }
 
 .center {
@@ -13,6 +15,7 @@ html, body {
 	margin-bottom: 20px;
 	max-height: 300px;
 	overflow-y: auto;
+	padding: 8px;
 }
 
 #send {
@@ -24,5 +27,52 @@ html, body {
 }
 
 #settings-box {
-	margin-bottom: 60px;
+	margin-bottom: 50px;
+}
+
+#nickname, #chatwith {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+
+#send-box {
+	margin-bottom: 5px;
+}
+
+
+input, button {
+	border: 0.5px solid black;
+	padding: 5px;
+}
+
+div, input, button {
+	border-radius: 5px;
+}
+
+
+@media screen and (max-width: 500px) {
+	html, body {
+		width: 90%;
+	}
+}
+
+@media screen and (max-width: 340px) {
+	label {
+		margin-top: 5px;
+		display: block;
+	}
+
+	html, body {
+		width: 95%;
+	}
+
+	#settings-box {
+		text-align: center;
+	}
+}
+
+#chat-box, input, button {
+	background-color: #403E40;
+	color: #FAE3D6;
 }
