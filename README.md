@@ -11,5 +11,5 @@ After downloading this repository run file server.py with python 2.7 (tested wit
 
  * Documentation
  * Add style to website
- * Fix more messages bug
- * handle ajax fail
+ * Fix high CPU consumption (10%) by python
+ * fix error: [Errno 32] Broken pipe - probably caused by timeout closed connection from client

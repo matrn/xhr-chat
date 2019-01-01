@@ -85,7 +85,7 @@ class RequestHandler(BaseHTTPRequestHandler):   #function for handling requests
 
 			start = millis()   #actual millis (unix time)
 			leave = 0
-			while leave != 1 or millis() - leave < timeout:
+			while leave != 1 and millis() - start < timeout:
 				for a in msgs:
 					if(a[0] == stranger and a[1] == nick):
 						self.send_response(200)
@@ -97,13 +97,17 @@ class RequestHandler(BaseHTTPRequestHandler):   #function for handling requests
 						msgs.remove(a)   #remove this msg from list because we found correct client
 
 						leave = 1   #leave while loop
+						print("data sent, leaving")
+						break
 
 				time.sleep(0.1)   #for lowering CPU consumption
 
 			if leave == 0:   #no data for client
+				print("leaving because timeout")
 				self.send_response(204)
 				self.send_header("Content-type", "text/plain")
 				self.end_headers()
+				self.wfile.write("No data")
 
 		else:   #ERROR 404
 			send_404(self)

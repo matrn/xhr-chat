@@ -1,7 +1,7 @@
 var nickname = "";   //global variable for nickname
 var chatwith = "";   //global variable for stranger nickname (chatwith)
 var time = 5000;   //timeout in ms, same as server variable
-
+var get_msg_last_time = 0;   //last time (millis()) of getting new message - used for handling server fall or unexpected erros
 
 //----------settings functions---------
 function set_nickname(){   //for setting up new nickname
@@ -17,20 +17,43 @@ function set_chatwith(){   //for settings up new stranger nickname
 
 
 //----------requests and assitants functions----------
-function ajax(type, path, data, timeout, func){   //ajax XHR wrapper
+function ajax(type, path, data, timeout, func, timeout_func){   //ajax XHR wrapper
 	var xhr = new XMLHttpRequest();
  
-	xhr.onreadystatechange = function() {
-		if(this.readyState == 4 && this.status == 200){
-			func(this.responseText);   //call gived function
-		}
+	xhr.onload = function() {
+		//if(this.readyState === 4){
+			if(this.status === 200){
+				func(this.responseText);   //call gived function
+			}
+			else if(this.status === 204){   //no data
+				timeout_func();   //call timeout function because server closed connection with return code 204 - no conten (data)
+			}
+
+			else if(this.status === 0){   //no data
+				console.log("Status is 0, error: " + this.statusText);
+				//timeout_func();   //call timeout function because server closed connection with return code 204 - no conten (data)
+			}
+
+			else{
+				console.log(this.status);
+				fail("Unknown status: " + this.status);
+			}
+		//}
 		/*
 		else{
 			fail(this.status + " " + this.responseText);
 		}*/
 	};
 	xhr.open(type, path, true);
-	if(timeout > 0) xhr.timeout = timeout;   //set timeout if timeout is bigger than 0
+	if(timeout > 0){
+		xhr.timeout = timeout;   //set timeout if timeout is bigger than 0
+
+		xhr.ontimeout = function (e){
+			//console.log(e);
+			//console.log("timeout");
+			timeout_func();
+		};
+	}
 
 	var fin = new Object();   //create new object (for JSON)
 	fin.nick = nickname;   //save nickname
@@ -56,31 +79,46 @@ function nothing(t){   //useful function, huh?
 
 //----------functions for sending and receiving messages (and also displaying)---------
 function send_msg(){   //for sending new message via ajax and displaying in message box
-	var msg = document.getElementById("send-box").value;   //get mesg from input textbox
+	var send_box = document.getElementById("send-box");   //get index to send-box element
+	var msg = send_box.value;   //get mesg from input textbox
 
 	if(msg.length < 1){   //skip blank messages
-		document.getElementById("send-box").placeholder = "Minimum length is 1 character!";
+		send_box.placeholder = "Minimum length is 1 character!";
 	}else{
-		document.getElementById("send-box").placeholder = "";   //remove placeholder from input message text box
+		send_box.placeholder = "";   //remove placeholder from input message text box
 
-		ajax("POST", "submit_msg", msg, -1, nothing);   //send new message to server without timeout
-		var chat_box_content = document.getElementById("chat-box").innerHTML;   //get current data from chat box
+		ajax("POST", "submit_msg", msg, -1, nothing, nothing);   //send new message to server without timeout
 
-		document.getElementById("chat-box").innerHTML = chat_box_content + "<span><b>You: </b>" + msg + "</span><br>";   //put current data + new data to chat box
-		document.getElementById("send-box").value = "";   //clear input message text box value
+		var chat_box = document.getElementById("chat-box");   //get index to chat-box element
+		var chat_box_content = chat_box.innerHTML;   //get current data from chat box
+		chat_box.innerHTML = chat_box_content + "<span><b>You: </b>" + msg + "</span><br>";   //put current data + new data to chat box  
+		chat_box.scrollTop = chat_box.scrollHeight;   //scroll into view in chat box
+
+		send_box.value = "";   //clear input message text box value
 	}
 }
 
 
 function new_msg(msg){   //function for displaying new message from stranger
-	var chat_box_content = document.getElementById("chat-box").innerHTML;   //get current data from chat box
-	document.getElementById("chat-box").innerHTML = chat_box_content + "<span><b>Stranger: </b>" + msg + "</span><br>";   //put current data + new data to chat box
+	var chat_box = document.getElementById("chat-box");   //get index to chat-box element
+	var chat_box_content = chat_box.innerHTML;   //get current data from chat box
+	chat_box.innerHTML = chat_box_content + "<span><b>Stranger: </b>" + msg + "</span><br>";   //put current data + new data to chat box
+	chat_box.scrollTop = chat_box.scrollHeight;   //scrol into view in chat box
+
+	check_msg();   //call function check_msg to create ajax request with timeout
 }
 
 
 function check_msg(){   //for calling ajax and setting up new interval
-	ajax("GET", "get_msg", "", time, new_msg);   //send xhr request with timeout
-	setTimeout(check_msg, time);   //set timeout to call new function (call after timeout)
+	ajax("GET", "get_msg", "", time, new_msg, check_msg);   //send xhr request with timeout
+	get_msg_last_time = Date.now();
+	//setTimeout(check_msg, time);   //set timeout to call new function (call after timeout)
+}
+
+function renew_check_msg_cycle(){
+	if(Date.now() - get_msg_last_time > time){
+		check_msg();
+	}
 }
 //----------functions for sending and receiving messages (and also displaying)---------
 
@@ -91,4 +129,6 @@ set_nickname();
 set_chatwith();
 
 check_msg();
+
+setInterval(renew_check_msg_cycle, time);
 //----------startup----------

@@ -11,6 +11,8 @@ html, body {
 	border: 1px solid black;
 	min-height: 80px;
 	margin-bottom: 20px;
+	max-height: 300px;
+	overflow-y: auto;
 }
 
 #send {
