@@ -17,10 +17,10 @@ After that I was googling about it and I find out that this technique is called 
 
 Tested with python2.7
 #### Server:
-	```python server.py```
+ * ```python server.py```
 
 ### Client:
-	Open your browser, write your IP:8008 and start chatting!
+ * Open your browser, write your IP:8008 and start chatting!
 
 ## ToDo
 
