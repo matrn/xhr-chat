@@ -19,7 +19,7 @@ Tested with python2.7
 #### Server:
  * ```python server.py```
 
-### Client:
+#### Client:
  * Open your browser, write your IP:8008 and start chatting!
 
 ## ToDo
